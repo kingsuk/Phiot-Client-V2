@@ -76,7 +76,7 @@ fun MainScreen(
                 NavigationDrawerItem(
                     label = { Text("Logout") },
                     selected = false,
-                    icon = { Icon(Icons.Default.Logout, contentDescription = null) },
+                    icon = { Icon(Icons.AutoMirrored.Filled.Logout, contentDescription = null) },
                     onClick = {
                         scope.launch { drawerState.close() }
                         onLogout()

@@ -14,3 +14,5 @@
 .cxx
 local.properties
 .kotlin/
+Thumbs.db
+**/.DS_Store
