@@ -4,11 +4,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-
-
-    <!-- TODO: Update blank fragment layout -->
-    <android.support.v4.widget.SwipeRefreshLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/swiperefresh"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -16,22 +12,20 @@
         <ScrollView
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                >
+                android:orientation="vertical">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="230dp"
+                    android:background="@drawable/drawer_back_image"
                     android:orientation="horizontal"
                     android:padding="10dp"
-                    android:background="@drawable/drawer_back_image"
-                    android:weightSum="3">
+                    android:weightSum="3" />
 
-
-                </LinearLayout>
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -43,29 +37,29 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:textStyle="bold"
                         android:gravity="center"
+                        android:text="Please make sure you are connected to the Device through Wifi."
                         android:textColor="@color/colorPrimary"
-                        android:text="Please make sure you are connected to the Device through Wifi." />
+                        android:textStyle="bold" />
 
                     <Button
                         android:id="@+id/btnScan"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:gravity="center"
                         android:layout_gravity="center"
+                        android:gravity="center"
                         android:text="Scan"
-                        android:textColor="@color/textColor"/>
+                        android:textColor="@color/textColor" />
                 </LinearLayout>
+
                 <LinearLayout
+                    android:id="@+id/llScans"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:id="@+id/llScans"
-                    android:orientation="vertical">
+                    android:orientation="vertical" />
 
-                </LinearLayout>
             </LinearLayout>
 
         </ScrollView>
-    </android.support.v4.widget.SwipeRefreshLayout>
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 </LinearLayout>
