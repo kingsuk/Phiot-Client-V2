@@ -5,11 +5,13 @@ import androidx.lifecycle.viewModelScope
 import com.phiot.phiot_client.data.ApiException
 import com.phiot.phiot_client.data.PhiOTRepository
 import com.phiot.phiot_client.data.model.Device
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 data class DevicesUiState(
     val devices: List<Device> = emptyList(),
@@ -19,7 +21,8 @@ data class DevicesUiState(
     val statusMessage: String? = null,
 )
 
-class DevicesViewModel(
+@HiltViewModel
+class DevicesViewModel @Inject constructor(
     private val repository: PhiOTRepository,
 ) : ViewModel() {
 

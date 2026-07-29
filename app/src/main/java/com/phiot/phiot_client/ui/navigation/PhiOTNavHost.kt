@@ -3,43 +3,28 @@ package com.phiot.phiot_client.ui.navigation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navArgument
+import androidx.navigation.toRoute
 import com.phiot.phiot_client.ui.components.LoadingScreen
 import com.phiot.phiot_client.ui.dataset.DatasetScreen
 import com.phiot.phiot_client.ui.login.LoginScreen
 import com.phiot.phiot_client.ui.main.MainScreen
-import com.phiot.phiot_client.ui.rememberRepository
-import kotlinx.coroutines.launch
-
-object Routes {
-    const val LOGIN = "login"
-    const val MAIN = "main"
-    const val DATASET = "dataset?deviceId={deviceId}&token={token}"
-
-    fun dataset(deviceId: String, token: String): String =
-        "dataset?deviceId=$deviceId&token=$token"
-}
+import com.phiot.phiot_client.ui.session.SessionViewModel
 
 @Composable
-fun PhiOTNavHost() {
-    val repository = rememberRepository()
+fun PhiOTNavHost(
+    sessionViewModel: SessionViewModel = hiltViewModel(),
+) {
     val navController = rememberNavController()
-    val scope = rememberCoroutineScope()
-    val session by repository.session.collectAsStateWithLifecycle(initialValue = null)
-    var isReady by remember { mutableStateOf(false) }
+    val session by sessionViewModel.session.collectAsStateWithLifecycle()
+    val isReady by sessionViewModel.isReady.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
-        repository.restoreSession()
-        isReady = true
+        sessionViewModel.bootstrap()
     }
 
     if (!isReady) {
@@ -47,57 +32,56 @@ fun PhiOTNavHost() {
         return
     }
 
+    val startDestination = if (session != null) MainRoute else LoginRoute
+
     NavHost(
         navController = navController,
-        startDestination = if (session != null) Routes.MAIN else Routes.LOGIN,
+        startDestination = startDestination,
     ) {
-        composable(Routes.LOGIN) {
+        composable<LoginRoute> {
             LoginScreen(
                 onLoginSuccess = {
-                    navController.navigate(Routes.MAIN) {
-                        popUpTo(Routes.LOGIN) { inclusive = true }
+                    navController.navigate(MainRoute) {
+                        popUpTo<LoginRoute> { inclusive = true }
                     }
                 },
             )
         }
 
-        composable(Routes.MAIN) {
+        composable<MainRoute> {
             if (session == null) {
                 LaunchedEffect(Unit) {
-                    navController.navigate(Routes.LOGIN) {
-                        popUpTo(Routes.MAIN) { inclusive = true }
+                    navController.navigate(LoginRoute) {
+                        popUpTo<MainRoute> { inclusive = true }
                     }
                 }
                 LoadingScreen()
             } else {
                 MainScreen(
                     onLogout = {
-                        scope.launch {
-                            repository.logout()
-                            navController.navigate(Routes.LOGIN) {
-                                popUpTo(Routes.MAIN) { inclusive = true }
+                        sessionViewModel.logout {
+                            navController.navigate(LoginRoute) {
+                                popUpTo<MainRoute> { inclusive = true }
                             }
                         }
                     },
                     onDeviceClick = { device ->
-                        navController.navigate(Routes.dataset(device.id, device.deviceToken))
+                        navController.navigate(
+                            DatasetRoute(
+                                deviceId = device.id,
+                                token = device.deviceToken,
+                            ),
+                        )
                     },
                 )
             }
         }
 
-        composable(
-            route = Routes.DATASET,
-            arguments = listOf(
-                navArgument("deviceId") { type = NavType.StringType },
-                navArgument("token") { type = NavType.StringType },
-            ),
-        ) { backStackEntry ->
-            val deviceId = backStackEntry.arguments?.getString("deviceId").orEmpty()
-            val token = backStackEntry.arguments?.getString("token").orEmpty()
+        composable<DatasetRoute> { backStackEntry ->
+            val route = backStackEntry.toRoute<DatasetRoute>()
             DatasetScreen(
-                deviceId = deviceId,
-                deviceToken = token,
+                deviceId = route.deviceId,
+                deviceToken = route.token,
                 onBack = { navController.popBackStack() },
             )
         }

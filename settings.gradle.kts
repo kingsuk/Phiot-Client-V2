@@ -15,4 +15,4 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "PhiOT-Client"
-include ':app'
+include(":app")

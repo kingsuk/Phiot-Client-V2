@@ -16,8 +16,11 @@ import kotlinx.coroutines.flow.first
 import kotlinx.serialization.json.Json
 import retrofit2.HttpException
 import java.io.IOException
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class PhiOTRepository(
+@Singleton
+class PhiOTRepository @Inject constructor(
     private val tokenStore: TokenStore,
     private val tokenHolder: AuthTokenHolder,
     private val cloudApi: PhiOTCloudApi,

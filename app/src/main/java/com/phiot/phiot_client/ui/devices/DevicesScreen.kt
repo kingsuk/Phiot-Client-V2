@@ -1,6 +1,5 @@
 package com.phiot.phiot_client.ui.devices
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -35,21 +34,21 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import coil.compose.AsyncImage
 import com.phiot.phiot_client.R
 import com.phiot.phiot_client.data.model.Device
+import com.phiot.phiot_client.ui.components.HeaderImage
 import com.phiot.phiot_client.ui.components.LoadingScreen
-import com.phiot.phiot_client.ui.phiOTViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DevicesScreen(
     onDeviceClick: (Device) -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: DevicesViewModel = phiOTViewModel { DevicesViewModel(it) },
+    viewModel: DevicesViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -119,13 +118,12 @@ fun DevicesScreen(
                         verticalArrangement = Arrangement.spacedBy(8.dp),
                     ) {
                         item {
-                            Image(
-                                painter = painterResource(R.drawable.cover1),
+                            HeaderImage(
+                                imageRes = R.drawable.cover1,
                                 contentDescription = null,
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .height(160.dp),
-                                contentScale = ContentScale.Crop,
                             )
                         }
                         items(uiState.devices, key = { it.id }) { device ->
@@ -160,10 +158,8 @@ private fun DeviceCard(
                 .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Image(
-                painter = painterResource(
-                    if (device.deviceTypeId == 1) R.drawable.devicetype1 else R.drawable.devicetype2,
-                ),
+            AsyncImage(
+                model = if (device.deviceTypeId == 1) R.drawable.devicetype1 else R.drawable.devicetype2,
                 contentDescription = null,
                 modifier = Modifier.size(48.dp),
             )

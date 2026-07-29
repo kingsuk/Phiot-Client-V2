@@ -1,6 +1,5 @@
 package com.phiot.phiot_client.ui.dataset
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -37,15 +36,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
+import coil.compose.AsyncImage
 import com.phiot.phiot_client.R
 import com.phiot.phiot_client.data.model.Dataset
+import com.phiot.phiot_client.ui.components.HeaderImage
 import com.phiot.phiot_client.ui.components.LoadingScreen
-import com.phiot.phiot_client.ui.rememberRepository
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -54,13 +52,9 @@ fun DatasetScreen(
     deviceToken: String,
     onBack: () -> Unit,
 ) {
-    val repository = rememberRepository()
-    val viewModel: DatasetViewModel = viewModel(
-        factory = object : androidx.lifecycle.ViewModelProvider.Factory {
-            @Suppress("UNCHECKED_CAST")
-            override fun <T : androidx.lifecycle.ViewModel> create(modelClass: Class<T>): T {
-                return DatasetViewModel(repository, deviceId, deviceToken) as T
-            }
+    val viewModel: DatasetViewModel = hiltViewModel(
+        creationCallback = { factory: DatasetViewModel.Factory ->
+            factory.create(deviceId, deviceToken)
         },
     )
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -125,13 +119,12 @@ fun DatasetScreen(
                     verticalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
                     item {
-                        Image(
-                            painter = painterResource(R.drawable.cover2),
+                        HeaderImage(
+                            imageRes = R.drawable.cover2,
                             contentDescription = null,
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(140.dp),
-                            contentScale = ContentScale.Crop,
                         )
                     }
                     item {
@@ -188,14 +181,12 @@ private fun DeviceInfoHeader(
                     color = MaterialTheme.colorScheme.primary,
                 )
             }
-            Image(
-                painter = painterResource(
-                    if (deviceTypeId == 1) {
-                        R.drawable.devicetype1_transparent
-                    } else {
-                        R.drawable.devicetype2
-                    },
-                ),
+            AsyncImage(
+                model = if (deviceTypeId == 1) {
+                    R.drawable.devicetype1_transparent
+                } else {
+                    R.drawable.devicetype2
+                },
                 contentDescription = null,
                 modifier = Modifier.size(72.dp),
             )
