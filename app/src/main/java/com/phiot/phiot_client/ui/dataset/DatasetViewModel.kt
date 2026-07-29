@@ -6,6 +6,10 @@ import com.phiot.phiot_client.data.ApiException
 import com.phiot.phiot_client.data.PhiOTRepository
 import com.phiot.phiot_client.data.model.Dataset
 import com.phiot.phiot_client.data.model.DeviceInfo
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -23,11 +27,20 @@ data class DatasetUiState(
     val statusMessage: String? = null,
 )
 
-class DatasetViewModel(
+@HiltViewModel(assistedFactory = DatasetViewModel.Factory::class)
+class DatasetViewModel @AssistedInject constructor(
     private val repository: PhiOTRepository,
-    private val deviceId: String,
-    private val deviceToken: String,
+    @Assisted("deviceId") private val deviceId: String,
+    @Assisted("deviceToken") private val deviceToken: String,
 ) : ViewModel() {
+
+    @AssistedFactory
+    interface Factory {
+        fun create(
+            @Assisted("deviceId") deviceId: String,
+            @Assisted("deviceToken") deviceToken: String,
+        ): DatasetViewModel
+    }
 
     private val _uiState = MutableStateFlow(DatasetUiState())
     val uiState: StateFlow<DatasetUiState> = _uiState.asStateFlow()

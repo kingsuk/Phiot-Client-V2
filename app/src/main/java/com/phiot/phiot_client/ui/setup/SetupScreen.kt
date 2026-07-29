@@ -1,6 +1,5 @@
 package com.phiot.phiot_client.ui.setup
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -29,20 +28,19 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.phiot.phiot_client.R
 import com.phiot.phiot_client.data.model.WifiNetwork
+import com.phiot.phiot_client.ui.components.HeaderImage
 import com.phiot.phiot_client.ui.components.LoadingScreen
-import com.phiot.phiot_client.ui.phiOTViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SetupScreen(
     modifier: Modifier = Modifier,
-    viewModel: SetupViewModel = phiOTViewModel { SetupViewModel(it) },
+    viewModel: SetupViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -84,13 +82,12 @@ fun SetupScreen(
                     verticalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
                     item {
-                        Image(
-                            painter = painterResource(R.drawable.drawer_back_image),
+                        HeaderImage(
+                            imageRes = R.drawable.drawer_back_image,
                             contentDescription = null,
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(180.dp),
-                            contentScale = ContentScale.Crop,
                         )
                     }
                     item {

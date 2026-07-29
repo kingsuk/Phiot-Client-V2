@@ -15,31 +15,37 @@ PhiOT Client connects your phone to PhiOT cloud services and to PhiOT hardware d
 
 ## Architecture
 
-The app uses a modern single-activity Android stack:
+Modern native Android app built with current Google-recommended patterns:
 
-- **Kotlin** with **Jetpack Compose** and **Material 3**
-- **MVVM** (`ViewModel` + `StateFlow`)
-- **Retrofit** + **OkHttp** + **kotlinx.serialization** for networking
+- **Kotlin** + **Jetpack Compose** + **Material 3** (dynamic color, dark theme)
+- **Single Activity** with **Navigation Compose** type-safe routes
+- **MVVM** with `ViewModel`, `StateFlow`, and `hiltViewModel()`
+- **Hilt** for dependency injection
+- **Retrofit** + **OkHttp** + **kotlinx.serialization**
 - **DataStore** for session persistence
-- **Navigation Compose** for screen flow
+- **Coil** for image loading
+- **Splash Screen API** + edge-to-edge UI
+- **Gradle Version Catalog** + **Kotlin DSL** build scripts
 
 ```
 app/src/main/java/com/phiot/phiot_client/
-├── MainActivity.kt              # Compose entry point
-├── PhiOTApplication.kt          # App-wide dependencies
+├── MainActivity.kt
+├── PhiOTApplication.kt          # @HiltAndroidApp
+├── di/NetworkModule.kt          # Hilt network providers
 ├── data/
-│   ├── model/                   # API models
-│   ├── local/                   # DataStore session storage
-│   ├── remote/                  # Retrofit APIs + auth interceptor
-│   └── PhiOTRepository.kt       # Data layer facade
+│   ├── model/
+│   ├── local/TokenStore.kt
+│   ├── remote/
+│   └── PhiOTRepository.kt
 └── ui/
-    ├── login/                   # Login screen
-    ├── devices/                 # Device list
-    ├── setup/                   # Wi‑Fi provisioning
-    ├── dataset/                 # Remote device control
-    ├── main/                    # Navigation drawer shell
-    ├── navigation/              # NavHost and routes
-    └── theme/                   # Material 3 theme
+    ├── login/
+    ├── devices/
+    ├── setup/
+    ├── dataset/
+    ├── main/
+    ├── navigation/              # Type-safe routes + NavHost
+    ├── session/SessionViewModel.kt
+    └── theme/
 ```
 
 ## Requirements
@@ -47,6 +53,7 @@ app/src/main/java/com/phiot/phiot_client/
 - Android Studio Ladybug (2024.2.1) or newer recommended
 - JDK 17
 - Android SDK 35
+- minSdk 24 (Android 7.0+)
 - A PhiOT account and registered devices (for cloud features)
 - Physical PhiOT hardware on its setup Wi‑Fi network (for provisioning)
 
@@ -61,13 +68,13 @@ cd Phiot-Client-V2
 
 ### 2. Configure the Android SDK
 
-Create `local.properties` in the project root (this file is gitignored and must not be committed):
+Create `local.properties` in the project root (gitignored — do not commit):
 
 ```properties
 sdk.dir=/path/to/your/Android/sdk
 ```
 
-In Android Studio, open the project and let Gradle sync.
+Open the project in Android Studio and let Gradle sync.
 
 ### 3. Build and run
 
@@ -75,7 +82,7 @@ In Android Studio, open the project and let Gradle sync.
 ./gradlew assembleDebug
 ```
 
-Install the debug APK on a device or emulator, or run directly from Android Studio.
+Install the debug APK on a device or run directly from Android Studio.
 
 ## Configuration
 
@@ -86,13 +93,9 @@ API endpoints are defined in `AppConfig.kt`:
 | `CLOUD_BASE_URL` | `https://phiot.azurewebsites.net/api/` | PhiOT cloud REST API |
 | `DEVICE_BASE_URL` | `http://192.168.4.22/` | Local device API during Wi‑Fi setup |
 
-`DEVICE_BASE_URL` is the default IP for PhiOT hardware in setup mode. Change it in `AppConfig.kt` if your device uses a different address.
-
-Cleartext HTTP to the local device is enabled in the manifest so setup works on a typical IoT access-point network.
+Cleartext HTTP is allowed only for the device setup IP via `network_security_config.xml`, not globally.
 
 ## Permissions
-
-The app requests:
 
 - `INTERNET` — cloud API access
 - `ACCESS_NETWORK_STATE` — connectivity checks
@@ -106,15 +109,17 @@ The app requests:
 | Gradle | 8.9 |
 | Android Gradle Plugin | 8.7.3 |
 | Kotlin | 2.0.21 |
-| compileSdk / targetSdk | 35 |
-| minSdk | 21 |
+| Hilt | 2.52 |
 | Compose BOM | 2024.10.01 |
+| compileSdk / targetSdk | 35 |
+| minSdk | 24 |
 
 ## Security notes
 
 - **No API keys or secrets belong in this repository.** Authentication uses a bearer token returned at login and stored in DataStore on the device.
 - Do **not** commit `local.properties`, keystores, or signing credentials.
 - User passwords are sent only to the PhiOT auth endpoint at login and are not stored locally.
+- Release builds use R8 minification and resource shrinking.
 
 ## Related links
 
